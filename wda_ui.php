@@ -2,102 +2,99 @@
 <link rel="stylesheet" type="text/css" href="font-awesome-4.2.0/css/font-awesome.css">-->
 <div class="wrap" style="min-height:512px;">
 	<section class="wda-container">
-<?php 
-	// Declaration
-	global $wpdb;
-	global $wdaDbObj;
-	global $URL;
-	global $QueryStringStart;
-	
-?>
+		<?php
+		// Declaration
+		global $wpdb;
+		global $wdaDbObj;
+		global $URL;
+		global $QueryStringStart;
+		?>
 		<div class="row">
 			<div class="col-12">
 				<label for="txtTablePrefix">Table Prefix : </label>
 				<input type="text" id="txtTablePrefix" readonly  value="<?php echo $wpdb->prefix; ?>">
-				<?php //echo '<pre>POST : '; print_r($_POST); echo '</pre>'; ?>
+				<?php //echo '<pre>POST : '; print_r($_POST); echo '</pre>';  ?>
 				<?php //echo '<pre>GET : '; print_r($_GET); echo '</pre>'; ?>
 			</div>
 		</div>
-<?php
-
-	if(isset($_GET['action'])):
-	echo '<div class="row"><div class="col-12 notice">';// Notic Start
-		// DROP table Process start here
-		if(isset($_GET['action']) && $_GET['action']=='drop' && isset($_GET['tbl'])):
-			$qryDropTable = "DROP TABLE ".$_GET['tbl'].';';
-			$affectedRow=$wdaDbObj->ExecuteNoneQuery($qryDropTable);
-			if(gettype($affectedRow)=="string"){
-				echo $affectedRow;
-			}else{
-				echo 'Table '.$_GET['tbl'].' has Droped<br>';
-				//echo $affectedRow.' Row Affected<br>';
-			}
-		endif; // DROP Table Process complated
-		
-		// TRUNCATE table Process start here
-		if(isset($_GET['action']) && $_GET['action']=='trunc' && isset($_GET['tbl'])):
-			$qryDropTable = "TRUNCATE TABLE ".$_GET['tbl'].';';
-			//echo $qryDropTable."<br>";
-			$affectedRow=$wdaDbObj->ExecuteNoneQuery($qryDropTable);
-			if(gettype($affectedRow)=="string"){
-				echo $affectedRow;
-			}else{
-				echo 'Table '.$_GET['tbl'].' has Truncated<br>';
-				//echo $affectedRow.' Row Affected<br>';
-			}
-		endif; // TRUNCATE Table Process complated
-	echo '<a id="notice-close" href="javascript:" class="wda-close"><span class="fa fa-close"></span></a></div></div>'; // Notic End
-	endif;
-	
-	if(isset( $_REQUEST['wda_query_form_nonce']) &&  wp_verify_nonce($_REQUEST['wda_query_form_nonce'],'wda_query_form')): // check Wp_validation
-	echo '<div class="row"><div class="col-12 notice">';// Notic Start
-		 
-		// Execute When Custome Query is fired
-		if(isset($_POST['wda_btnSubmit']) && $_POST['wda_btnSubmit']=='Submit' && $_POST['wda_txtQuery']!=''):
-			$flagCustom=true;
-			$qryCustom=$_POST['wda_txtQuery'];
-			// maintain Query
-			$qryCustom=str_replace('\\','',trim($qryCustom));
-			// find action
-			// 1 for SELECT or Displayable statments 
-			// 0 for Manag statment [insert, update ,delete] that doesn't display data
-			$displayActionList = array('select','show');
-			$action = explode(' ',$qryCustom);
-			$action = $action[0];
-			$isDisplayTable = in_array(strtolower($action),$displayActionList)?1:0;
-			//$isDisplayTable = strtolower((substr($qryCustom,0,4)))=='show'?1:0;
-			
-			// Execute base on Statment
-			//echo "Displat Table : ".$isDisplayTable."<br>";
-			if($isDisplayTable===1){
-				$rsCustome=$wdaDbObj->ExecuteQuery($qryCustom);
-				if( gettype($rsCustome)!='resource'){ echo $rsCustome; }
-			}elseif($isDisplayTable===0){
-				$affectedRow=$wdaDbObj->ExecuteNoneQuery($qryCustom);
-				if(gettype($affectedRow)=="string"){
+		<?php
+		if ( isset( $_GET['action'] ) ):
+			echo '<div class="row"><div class="col-12 notice">'; // Notic Start
+			// DROP table Process start here
+			if ( isset( $_GET['action'] ) && $_GET['action'] == 'drop' && isset( $_GET['tbl'] ) ):
+				$qryDropTable = "DROP TABLE " . $_GET['tbl'] . ';';
+				$affectedRow = $wdaDbObj->ExecuteNoneQuery( $qryDropTable );
+				if ( gettype( $affectedRow ) == "string" ) {
 					echo $affectedRow;
-				}else{
-					echo $affectedRow.' Row Affected<br>';
+				} else {
+					echo 'Table ' . $_GET['tbl'] . ' has Droped<br>';
+					//echo $affectedRow.' Row Affected<br>';
 				}
-			}else{
-				echo "Somthing Goes Wrong<br>";	
-			}
+			endif; // DROP Table Process complated
+			// TRUNCATE table Process start here
+			if ( isset( $_GET['action'] ) && $_GET['action'] == 'trunc' && isset( $_GET['tbl'] ) ):
+				$qryDropTable = "TRUNCATE TABLE " . $_GET['tbl'] . ';';
+				//echo $qryDropTable."<br>";
+				$affectedRow = $wdaDbObj->ExecuteNoneQuery( $qryDropTable );
+				if ( gettype( $affectedRow ) == "string" ) {
+					echo $affectedRow;
+				} else {
+					echo 'Table ' . $_GET['tbl'] . ' has Truncated<br>';
+					//echo $affectedRow.' Row Affected<br>';
+				}
+			endif; // TRUNCATE Table Process complated
+			echo '<a id="notice-close" href="javascript:" class="wda-close"><span class="fa fa-close"></span></a></div></div>'; // Notic End
+		endif;
+
+		if ( isset( $_REQUEST['wda_query_form_nonce'] ) && wp_verify_nonce( $_REQUEST['wda_query_form_nonce'], 'wda_query_form' ) ): // check Wp_validation
+			echo '<div class="row"><div class="col-12 notice">'; // Notic Start
+			// Execute When Custome Query is fired
+			if ( isset( $_POST['wda_btnSubmit'] ) && $_POST['wda_btnSubmit'] == 'Submit' && $_POST['wda_txtQuery'] != '' ):
+				$flagCustom = true;
+				$qryCustom = $_POST['wda_txtQuery'];
+				// maintain Query
+				$qryCustom = str_replace( '\\', '', trim( $qryCustom ) );
+				// find action
+				// 1 for SELECT or Displayable statments 
+				// 0 for Manag statment [insert, update ,delete] that doesn't display data
+				$displayActionList = array( 'select', 'show' );
+				$action = explode( ' ', $qryCustom );
+				$action = $action[0];
+				$isDisplayTable = in_array( strtolower( $action ), $displayActionList ) ? 1 : 0;
+				//$isDisplayTable = strtolower((substr($qryCustom,0,4)))=='show'?1:0;
+				// Execute base on Statment
+				//echo "Displat Table : ".$isDisplayTable."<br>";
+				if ( $isDisplayTable === 1 ) {
+					$rsCustome = $wdaDbObj->ExecuteQuery( $qryCustom );
+					if ( gettype( $rsCustome ) != 'resource' ) {
+						echo $rsCustome;
+					}
+				} elseif ( $isDisplayTable === 0 ) {
+					$affectedRow = $wdaDbObj->ExecuteNoneQuery( $qryCustom );
+					if ( gettype( $affectedRow ) == "string" ) {
+						echo $affectedRow;
+					} else {
+						echo $affectedRow . ' Row Affected<br>';
+					}
+				} else {
+					echo "Somthing Goes Wrong<br>";
+				}
 			//echo $qryCustom."<br>";
-		endif;// Custome Query Execution Function Ends Here
-	echo '<a id="notice-close" href="javascript:" class="wda-close"><span class="fa fa-close"></span></a></div></div>'; // Notic End
-	endif; // end of wp_validaiton
-?>
-		
+			endif; // Custome Query Execution Function Ends Here
+			echo '<a id="notice-close" href="javascript:" class="wda-close"><span class="fa fa-close"></span></a></div></div>'; // Notic End
+		endif; // end of wp_validaiton
+		?>
+
 		<div class="row">
 			<div class="col-8">
-				<form name="wda_custome_query" method="post" action="<?php echo $URL;?>">
-					<?php	wp_nonce_field('wda_query_form','wda_query_form_nonce',true,true);	?>
+				<form name="wda_custome_query" method="post" action="<?php echo $URL; ?>">
+					<?php wp_nonce_field( 'wda_query_form', 'wda_query_form_nonce', true, true ); ?>
 					<div class="row">
 						<div class="col-12"><h4>Custome Query</h4></div>
 					</div>
 					<div class="row">
 						<div class="col-12">
-							<textarea id="wda_txtQuery" name="wda_txtQuery" required class="query-box" dropzone="copy" placeholder="Enter Query" title="Enter Query"><?php echo isset($_POST['wda_txtQuery'])?str_replace('\\','',$_POST['wda_txtQuery']):''; ?></textarea>
+							<textarea id="wda_txtQuery" name="wda_txtQuery" required class="query-box" dropzone="copy" placeholder="Enter Query" title="Enter Query"><?php echo isset( $_POST['wda_txtQuery'] ) ? str_replace( '\\', '', $_POST['wda_txtQuery'] ) : ''; ?></textarea>
 						</div>
 					</div>
 					<div class="row clear" style="padding-top:10px;">
@@ -149,25 +146,25 @@
 							<th >Action</th>
 						</tr>
 						<?php
-							$tableList=wda_showTable();
-							//$wdaDbObj->DisplayTable($tableList);
-							if($tableList){
-								while($row=mysql_fetch_array($tableList)){
-									echo '<tr>';
-										echo '<td><label><input type="checkbox" name="controlTable" id="controlTable" data-table="'.$row[0].'" value="'.$row[0].'">'.$row[0].'</label></td>';
-										echo '<td>
-												<a class="table-action" href="javascript:" tabindex="-1" data-action="browse" data-table="'.$row[0].'" title="Display Data"><span class="fa fa-file-text"></span></a>
-												<a class="table-action" href="javascript:" tabindex="-1" data-action="structure" data-table="'.$row[0].'" title="Display Structure"><span class="fa fa-file-text-o"></span></a>
+						$tableList = wda_showTable();
+//$wdaDbObj->DisplayTable($tableList);
+						if ( $tableList ) {
+							while ( $row = mysql_fetch_array( $tableList ) ) {
+								echo '<tr>';
+								echo '<td><label><input type="checkbox" name="controlTable" id="controlTable" data-table="' . $row[0] . '" value="' . $row[0] . '">' . $row[0] . '</label></td>';
+								echo '<td>
+												<a class="table-action" href="javascript:" tabindex="-1" data-action="browse" data-table="' . $row[0] . '" title="Display Data"><span class="fa fa-file-text"></span></a>
+												<a class="table-action" href="javascript:" tabindex="-1" data-action="structure" data-table="' . $row[0] . '" title="Display Structure"><span class="fa fa-file-text-o"></span></a>
 												
-												<a class="" href="'.$URL.$QueryStringStart.'action=trunc&tbl='.$row[0].'" tabindex="-1" data-action="trunc" data-table="'.$row[0].'" title="Truncate Table"><span class="fa fa-trash-o"></span></a>
-												<a class="" href="'.$URL.$QueryStringStart.'action=drop&tbl='.$row[0].'" tabindex="-1" data-action="drop" data-table="'.$row[0].'" title="Drop Table"><span class="fa fa-trash"></span></a>
+												<a class="" href="' . $URL . $QueryStringStart . 'action=trunc&tbl=' . $row[0] . '" tabindex="-1" data-action="trunc" data-table="' . $row[0] . '" title="Truncate Table"><span class="fa fa-trash-o"></span></a>
+												<a class="" href="' . $URL . $QueryStringStart . 'action=drop&tbl=' . $row[0] . '" tabindex="-1" data-action="drop" data-table="' . $row[0] . '" title="Drop Table"><span class="fa fa-trash"></span></a>
 												
 											</td>';
-									echo '</tr>';	
-								}	
+								echo '</tr>';
 							}
-							// 'table-action' class is used for Ajax-pop 
-							//echo '<a class="table-action" href="'.$URL.$QueryStringStart.'action=alter&tbl='.$row[0].'" tabindex="-1" data-action="alter" data-table="'.$row[0].'" title="Alter Table"><span class="fa fa-edit"></span></a>';
+						}
+// 'table-action' class is used for Ajax-pop 
+//echo '<a class="table-action" href="'.$URL.$QueryStringStart.'action=alter&tbl='.$row[0].'" tabindex="-1" data-action="alter" data-table="'.$row[0].'" title="Alter Table"><span class="fa fa-edit"></span></a>';
 						?>
 					</table>
 				</div>
@@ -175,29 +172,29 @@
 		</div>
 		<!-- Display Table -->
 		<?php
-			echo '<div id="popup" class="row table-container display-none">
+		echo '<div id="popup" class="row table-container display-none">
 					<div class="col-12" style="text-align:right;min-height:40px;">
 						<a id="popup-close" href="javascript:" class="wda-close"><span class="fa fa-close"></span></a>
 					</div>
 					<div id="popup-contant" class="col-12 " >';
-					if(isset( $_REQUEST['wda_query_form_nonce']) &&  wp_verify_nonce($_REQUEST['wda_query_form_nonce'],'wda_query_form')): // check Wp_validation
-					//echo '<pre>'; print_r($_POST); echo '</pre>';
-						if(isset($_GET['action']) && $_GET['action']=='show' && isset($_GET['tbl'])): // Display Table
-							$TableName=$_GET['tbl'];
-							$qryGetTableDetail="SELECT * FROM ".$TableName.";";
-							$rsGetTableDetail = $wdaDbObj->ExecuteQuery($qryGetTableDetail);
-							$wdaDbObj->DisplayTable($rsGetTableDetail);
-							echo '<script type="text/javascript">jQuery(document).ready(function(e){jQuery("#popup").slideDown("fast");});</script>';
-						elseif(isset($_GET['action']) && $_GET['action']=='struct' && isset($_GET['tbl'])): // work only if GET Method is Come
-							$TableName=$_GET['tbl'];
-							$wdaDbObj->DisplayTable(wda_showTableStructure($TableName));
-							echo '<script type="text/javascript">jQuery(document).ready(function(e){jQuery("#popup").slideDown("fast");});</script>';
-						elseif(isset($flagCustom) && $isDisplayTable===1):
-							$wdaDbObj->DisplayTable($rsCustome);
-							echo '<script type="text/javascript">jQuery(document).ready(function(e){jQuery("#popup").slideDown("fast");});</script>';
-						endif;// Display Table Over
-					endif; // end of wp_validation
-			echo '</div></div>';
+		if ( isset( $_REQUEST['wda_query_form_nonce'] ) && wp_verify_nonce( $_REQUEST['wda_query_form_nonce'], 'wda_query_form' ) ): // check Wp_validation
+			//echo '<pre>'; print_r($_POST); echo '</pre>';
+			if ( isset( $_GET['action'] ) && $_GET['action'] == 'show' && isset( $_GET['tbl'] ) ): // Display Table
+				$TableName = $_GET['tbl'];
+				$qryGetTableDetail = "SELECT * FROM " . $TableName . ";";
+				$rsGetTableDetail = $wdaDbObj->ExecuteQuery( $qryGetTableDetail );
+				$wdaDbObj->DisplayTable( $rsGetTableDetail );
+				echo '<script type="text/javascript">jQuery(document).ready(function(e){jQuery("#popup").slideDown("fast");});</script>';
+			elseif ( isset( $_GET['action'] ) && $_GET['action'] == 'struct' && isset( $_GET['tbl'] ) ): // work only if GET Method is Come
+				$TableName = $_GET['tbl'];
+				$wdaDbObj->DisplayTable( wda_showTableStructure( $TableName ) );
+				echo '<script type="text/javascript">jQuery(document).ready(function(e){jQuery("#popup").slideDown("fast");});</script>';
+			elseif ( isset( $flagCustom ) && $isDisplayTable === 1 ):
+				$wdaDbObj->DisplayTable( $rsCustome );
+				echo '<script type="text/javascript">jQuery(document).ready(function(e){jQuery("#popup").slideDown("fast");});</script>';
+			endif; // Display Table Over
+		endif; // end of wp_validation
+		echo '</div></div>';
 		?>
 		<br clear="all"/>
 	</section>
